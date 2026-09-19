@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>King Broasted — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --kb-cream: #f6e5b5;
+      --kb-cream-2: #fff8df;
+      --kb-yellow: #f5c400;
+      --kb-orange: #e88912;
+      --kb-brown: #3a2208;
+      --bg: #0f0c08;
+      --bg-2: #17120c;
+      --bg-3: #211a12;
+      --bg-4: #2b2218;
+      --ink: #f6f1e8;
+      --muted: #9b968c;
+      --line: rgba(245, 196, 0, 0.12);
+      --red: #c45a00;
+      --red-deep: #8e3d00;
+      --red-soft: rgba(196, 90, 0, 0.16);
+      --cream: #f6e5b5;
+      --gold: #f5c400;
+      --ok: #3d9a6a;
+      --warn: #e3b341;
+      --info: #5b8def;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      --font: "Manrope", "Segoe UI", sans-serif;
+      --display: "Fredoka", "Trebuchet MS", sans-serif;
+      --radius: 18px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: #120e09;
+      color: var(--ink);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    button, input, textarea, select { font-family: inherit; }
+    button { cursor: pointer; }
+    img { max-width: 100%; display: block; }
+
+    /* ========== Pitch / presentación ========== */
+    .pitch {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background:
+        radial-gradient(900px 480px at 80% -10%, rgba(245, 196, 0, 0.28), transparent 45%),
+        #120e09;
+      color: #f6f1e8;
+      display: none;
+      flex-direction: column;
+      padding: 28px 28px 18px;
+    }
+    body.show-pitch .pitch { display: flex; }
+    body.show-pitch .presenter,
+    body.show-pitch .stage,
+    body.show-pitch .toast,
+    body.show-pitch .cue { display: none !important; }
+    .pitch-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .pitch-brand {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--kb-yellow);
+      font-weight: 700;
+    }
+    .pitch-skip {
+      border: 1px solid rgba(246, 229, 181, 0.25);
+      background: transparent;
+      color: #f6e5b5;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .pitch-slide { display: none; flex: 1; min-height: 0; flex-direction: column; justify-content: center; max-width: 820px; }
+    .pitch-slide.is-on { display: flex; }
+    .pitch-slide .eyebrow {
+      color: var(--kb-yellow);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .pitch-slide h1 {
+      font-family: var(--display);
+      font-size: clamp(32px, 6vw, 64px);
+      line-height: 0.95;
+      margin-bottom: 16px;
+    }
+    .pitch-slide h2 {
+      font-family: var(--display);
+      font-size: clamp(26px, 4.4vw, 42px);
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    .pitch-slide p.lead { font-size: 18px; color: #d8cbb0; max-width: 560px; line-height: 1.45; }
+    .pitch-list { list-style: none; margin-top: 8px; display: grid; gap: 12px; }
+    .pitch-list li {
+      background: rgba(255, 248, 223, 0.06);
+      border: 1px solid rgba(245, 196, 0, 0.14);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 16px;
+    }
+    .pitch-list b { color: var(--kb-yellow); }
+    .pitch-script { display: grid; gap: 10px; }
+    .pitch-script div {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      font-size: 16px;
+    }
+    .pitch-script span {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--kb-yellow);
+      color: #3a2208;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+    .pitch-cta {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pitch-cta button, .pitch-cta a {
+      border: 0;
+      background: var(--kb-yellow);
+      color: #3a2208;
+      font-weight: 800;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      text-decoration: none;
+    }
+    .pitch-cta .ghost {
+      background: transparent;
+      color: #f6e5b5;
+      border: 1px solid rgba(246, 229, 181, 0.3);
+    }
+    .pitch-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 16px;
+    }
+    .pitch-dots { display: flex; gap: 8px; }
+    .pitch-dots i {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(246, 229, 181, 0.25);
+      display: block;
+    }
+    .pitch-dots i.is-on { background: var(--kb-yellow); width: 22px; }
+    .pitch-nav button {
+      border: 0;
+      background: rgba(255, 248, 223, 0.08);
+      color: #f6e5b5;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 999px;
+    }
+    .cue {
+      display: none;
+      font-size: 11px;
+      color: #cfc6b4;
+      padding: 0 12px 6px;
+      background: #15130e;
+      border-bottom: 1px solid rgba(212, 176, 122, 0.18);
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+    body.presentation .cue { display: block; }
+    .cue b { color: var(--kb-yellow); }
+
+    /* ========== Presenter chrome ========== */
+    .presenter {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #15130e;
+      border-bottom: 1px solid rgba(212, 176, 122, 0.22);
+      z-index: 80;
+      position: relative;
+    }
+    .presenter-mark {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding-right: 8px;
+      border-right: 1px solid rgba(212, 176, 122, 0.25);
+      white-space: nowrap;
+    }
+    .presenter-tabs { display: flex; gap: 4px; flex: 1; }
+    .presenter-tabs button,
+    .presenter-actions button {
+      border: 0;
+      background: transparent;
+      color: #cfc6b4;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 999px;
+    }
+    .presenter-tabs button.is-on {
+      background: var(--cream);
+      color: #1a120c;
+    }
+    .presenter-actions { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+    .presenter-actions .ghost { color: #b9b09e; }
+    .presenter-actions .danger { color: #f0c2c2; }
+
+    body.presentation .presenter-mark,
+    body.presentation .presenter-hint { display: none; }
+    body.presentation .presenter { min-height: 40px; background: #0e0e0f; border-bottom-color: var(--line); }
+
+    .stage {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .view { display: none; height: 100%; }
+    .view.is-active { display: flex; }
+
+    /* ========== Shared UI ========== */
+    .toast {
+      position: fixed;
+      top: 62px;
+      right: 18px;
+      z-index: 90;
+      background: #17171a;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display: none;
+      min-width: 240px;
+      animation: rise 0.35s ease;
+    }
+    .toast.is-on { display: block; }
+    .toast strong { display: block; font-size: 13px; }
+    .toast span { color: var(--muted); font-size: 12px; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-row {
+      0% { box-shadow: inset 3px 0 0 var(--red); background: rgba(197, 31, 31, 0.12); }
+      100% { box-shadow: none; background: transparent; }
+    }
+    .pulse-new { animation: pulse-row 1.6s ease; }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .overlay.is-on { opacity: 1; pointer-events: auto; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+    .st-RECEIVED { background: rgba(227, 179, 65, 0.16); color: #f0d48a; }
+    .st-CONFIRMED { background: rgba(91, 141, 239, 0.16); color: #9bbcff; }
+    .st-PREPARING { background: rgba(227, 179, 65, 0.2); color: #f5d27a; }
+    .st-READY { background: rgba(61, 154, 106, 0.16); color: #8fd4ad; }
+    .st-ON_THE_WAY { background: rgba(91, 141, 239, 0.2); color: #9bbcff; }
+    .st-DELIVERED { background: rgba(61, 154, 106, 0.22); color: #9ee0bb; }
+    .st-CANCELLED { background: rgba(197, 31, 31, 0.18); color: #f3a3a3; }
+
+    /* ========== Customer ========== */
+    #view-customer {
+      background:
+        radial-gradient(900px 420px at 10% -10%, rgba(245, 196, 0, 0.28), transparent 50%),
+        var(--kb-cream);
+      flex-direction: column;
+      color: var(--kb-brown);
+    }
+    #view-customer .brand-kicker { color: #a56a00; }
+    #view-customer .brand-tag,
+    #view-customer .pcard p,
+    #view-customer .hero-combo p { color: #7a5a32; }
+    #view-customer .price,
+    #view-customer .hero-price { color: var(--kb-brown); }
+    #view-customer .cats button { color: #7a5a32; border-color: rgba(58, 34, 8, 0.14); }
+    #view-customer .cats button.is-on {
+      background: var(--kb-yellow);
+      color: var(--kb-brown);
+      border-color: var(--kb-yellow);
+    }
+    #view-customer .pcard,
+    #view-customer .hero-combo,
+    #view-customer .summary-card,
+    #view-customer .meta-grid div {
+      background: var(--kb-cream-2);
+      border-color: rgba(58, 34, 8, 0.12);
+      color: var(--kb-brown);
+    }
+    #view-customer .cart-btn {
+      background: var(--kb-cream-2);
+      color: var(--kb-brown);
+      border-color: rgba(58, 34, 8, 0.16);
+    }
+    #view-customer .field input,
+    #view-customer textarea {
+      background: #fffdf6;
+      color: var(--kb-brown);
+      border-color: rgba(58, 34, 8, 0.16);
+    }
+    #view-customer .btn-ghost { color: var(--kb-brown); border-color: rgba(58, 34, 8, 0.16); }
+    #view-customer .add-mini,
+    #view-customer .btn-primary {
+      background: var(--kb-brown);
+      color: var(--kb-cream);
+    }
+    .brand-logo {
+      height: 46px;
+      width: auto;
+      max-width: 150px;
+      object-fit: contain;
+      object-position: left center;
+      display: block;
+    }
+    .pcard-art.photo,
+    .modal-art.photo,
+    .cart-thumb.photo,
+    .hero-shot {
+      overflow: hidden;
+      background: #1a1208;
+    }
+    .pcard-art.photo img,
+    .modal-art.photo img,
+    .cart-thumb.photo img,
+    .hero-shot img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      object-fit: cover;
+      object-position: center;
+      z-index: 1;
+    }
+    .hero-combo.with-photo {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(160px, 0.85fr);
+      align-items: stretch;
+      padding: 0;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .hero-combo.with-photo .hero-copy {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+    .hero-combo.with-photo .hero-shot {
+      position: relative;
+      height: 100%;
+      min-height: 168px;
+      max-height: 200px;
+      aspect-ratio: 1 / 1;
+    }
+    #view-customer.is-active ~ .modal,
+    #view-customer.is-active ~ .drawer {
+      background: var(--kb-cream-2);
+      color: var(--kb-brown);
+      border-color: rgba(58, 34, 8, 0.12);
+    }
+    #view-customer.is-active ~ .modal textarea,
+    #view-customer.is-active ~ .drawer .btn-ghost {
+      color: var(--kb-brown);
+      border-color: rgba(58, 34, 8, 0.16);
+    }
+    #view-customer.is-active ~ .modal textarea { background: #fffdf6; }
+    #view-customer.is-active ~ .drawer .btn-primary,
+    #view-customer.is-active ~ .modal .btn-primary {
+      background: var(--kb-brown);
+      color: var(--kb-cream);
+    }
+    .c-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px 10px;
+    }
+    .brand-kicker {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .brand-name {
+      font-family: var(--display);
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .brand-tag { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .cart-btn {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--bg-3);
+      color: var(--ink);
+    }
+    .cart-btn svg { width: 22px; height: 22px; }
+    .cart-count {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 99px;
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+    }
+    .cart-count.is-on { display: flex; }
+
+    .cats {
+      display: flex;
+      gap: 8px;
+      padding: 8px 22px 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cats::-webkit-scrollbar { display: none; }
+    .cats button {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .cats button.is-on {
+      background: var(--cream);
+      color: #1b130c;
+      border-color: var(--cream);
+    }
+
+    .c-scroll {
+      flex: 1;
+      overflow: auto;
+      padding: 0 22px 28px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .pcard {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      text-align: left;
+      color: inherit;
+      width: 100%;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .pcard:hover { transform: translateY(-2px); border-color: rgba(243, 234, 216, 0.18); }
+    .pcard-art {
+      height: auto;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .pcard-art svg { width: 92px; height: 92px; }
+    .pcard-body { padding: 14px 14px 16px; }
+    .pcard h3 { font-size: 16px; font-weight: 700; }
+    .pcard p { color: var(--muted); font-size: 12px; margin: 6px 0 12px; min-height: 32px; }
+    .pcard-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .price { font-weight: 800; color: var(--cream); }
+    .add-mini {
+      background: var(--red);
+      color: white;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .featured {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .hero-combo {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(245, 196, 0, 0.28), transparent 55%),
+        var(--bg-2);
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: inherit;
+      text-align: left;
+      width: 100%;
+    }
+    .hero-combo small {
+      color: var(--gold);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .hero-combo h2 {
+      font-family: var(--display);
+      font-size: 32px;
+      margin: 6px 0 4px;
+      line-height: 1.05;
+    }
+    .hero-combo p { color: var(--muted); max-width: 360px; font-size: 13px; }
+    .hero-price { font-size: 24px; font-weight: 800; }
+
+    /* Modal / cart */
+    .modal, .drawer {
+      position: absolute;
+      z-index: 60;
+      background: #141416;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .modal {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -46%) scale(0.98);
+      width: min(520px, calc(100vw - 28px));
+      border-radius: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s ease;
+    }
+    .modal.is-on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .modal-art {
+      height: auto;
+      aspect-ratio: 16 / 10;
+      max-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px 24px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-body { padding: 20px 22px 22px; }
+    .modal-body h2 { font-family: var(--display); font-size: 32px; }
+    .modal-body .desc { color: var(--muted); margin: 6px 0 16px; }
+    .qty {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .qty button {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--bg-3);
+      color: var(--ink);
+      font-size: 18px;
+    }
+    .qty span { min-width: 24px; text-align: center; font-weight: 700; }
+    textarea, .field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    textarea { min-height: 72px; resize: none; margin-bottom: 14px; }
+    .btn-primary {
+      width: 100%;
+      border: 0;
+      background: var(--red);
+      color: white;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+    }
+    .btn-primary:disabled { opacity: 0.45; }
+    .btn-ghost {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 14px;
+      margin-top: 8px;
+    }
+
+    .drawer {
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(400px, 100%);
+      transform: translateX(104%);
+      transition: transform 0.28s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.is-on { transform: translateX(0); }
+    .drawer-head, .drawer-foot { padding: 18px 20px; }
+    .drawer-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+    .drawer-body { flex: 1; overflow: auto; padding: 12px 20px; }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .cart-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cart-item h4 { font-size: 14px; }
+    .cart-item small { color: var(--muted); }
+    .totals { display: grid; gap: 8px; font-size: 14px; margin-bottom: 12px; width: 100%; }
+    .totals div { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); }
+    .totals span:last-child { white-space: nowrap; }
+    .totals .grand { color: var(--ink); font-size: 18px; font-weight: 800; }
+
+    /* Checkout / tracking */
+    .panel {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 8px 0 40px;
+    }
+    .panel h1 {
+      font-family: var(--display);
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .summary-card {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      margin: 8px 0 16px;
+    }
+    .confirm {
+      text-align: left;
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 12px 4px 36px;
+    }
+    .check-orb {
+      width: 56px;
+      height: 56px;
+      margin: 0 0 12px;
+      border-radius: 50%;
+      background: rgba(61, 154, 106, 0.18);
+      color: #9ee0bb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      animation: rise 0.45s ease;
+    }
+    #view-customer .check-orb {
+      background: #f5c400;
+      color: #3a2208;
+    }
+    .confirm h1 { font-size: 28px; line-height: 1.1; }
+    .confirm .oid {
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      margin: 4px 0 10px;
+    }
+    .eta-card {
+      background: var(--kb-yellow);
+      color: var(--kb-brown);
+      border-radius: 22px;
+      padding: 18px 16px 16px;
+      text-align: center;
+      margin: 14px 0 14px;
+    }
+    .eta-card small {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .eta-card .mins {
+      font-family: var(--display);
+      font-size: 56px;
+      line-height: 0.9;
+      font-weight: 700;
+      margin: 6px 0 4px;
+    }
+    .eta-card p { font-size: 13px; font-weight: 600; }
+    .receipt {
+      background: var(--kb-cream-2);
+      border: 1px solid rgba(58, 34, 8, 0.12);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .receipt-row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+    .receipt-row span { color: #7a5a32; }
+    .receipt-note {
+      font-size: 13px;
+      color: #7a5a32;
+      line-height: 1.4;
+      padding-top: 4px;
+      border-top: 1px solid rgba(58, 34, 8, 0.1);
+    }
+    .ops-hint {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto 28px;
+      text-align: left;
+    }
+    .meta-grid div {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .meta-grid small { color: var(--muted); display: block; margin-bottom: 4px; }
+    .timeline { max-width: 420px; margin: 0 auto; text-align: left; }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 12px;
+      padding: 8px 0;
+      color: var(--muted);
+    }
+    .tl-item .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #3a3a3e;
+      margin-top: 3px;
+      background: transparent;
+    }
+    .tl-item.done { color: var(--ink); }
+    .tl-item.done .dot { background: var(--ok); border-color: var(--ok); }
+    .tl-item.current { color: var(--cream); }
+    .tl-item.current .dot { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 4px var(--red-soft); }
+
+    /* ========== Ops ========== */
+    #view-ops { background: #0d1016; }
+    .ops-side {
+      width: 232px;
+      background: #10141c;
+      border-right: 1px solid var(--line);
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ops-logo { padding: 6px 10px 18px; }
+    .ops-logo strong { display: block; letter-spacing: 0.12em; font-size: 12px; color: var(--gold); }
+    .ops-logo span { font-family: var(--display); font-size: 26px; }
+    .ops-nav button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: #c5c9d2;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .ops-nav button.is-on { background: rgba(245, 196, 0, 0.16); color: #f5c400; }
+    .ops-main { flex: 1; overflow: auto; padding: 22px 26px; min-width: 0; }
+    .ops-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
+    .ops-top h1 { font-size: 28px; font-weight: 800; }
+    .ops-top p { color: var(--muted); font-size: 13px; }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .kpi {
+      background: #151a23;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .kpi small { color: var(--muted); font-size: 12px; }
+    .kpi b { display: block; font-size: 28px; margin-top: 6px; }
+    .table {
+      background: #151a23;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .t-row, .t-head {
+      display: grid;
+      grid-template-columns: 120px 1.2fr 1fr 110px 140px 40px;
+      gap: 8px;
+      padding: 13px 16px;
+      align-items: center;
+    }
+    .t-head { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+    .t-row { width: 100%; background: transparent; border: 0; color: inherit; text-align: left; border-bottom: 1px solid var(--line); }
+    .t-row:hover { background: rgba(255, 255, 255, 0.03); }
+    .order-detail {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+      gap: 16px;
+    }
+    .card {
+      background: #151a23;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      min-width: 0;
+    }
+    .card h3 { margin-bottom: 12px; }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: 6px 10px; font-size: 14px; }
+    .kv span { color: var(--muted); }
+    .status-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .status-actions button {
+      border: 1px solid var(--line);
+      background: #10141c;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-actions button.is-now { background: #c45a00; border-color: #c45a00; }
+    .status-actions .cancel { color: #f3a3a3; }
+
+    /* ========== WhatsApp ========== */
+    #view-whatsapp {
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(600px 300px at 50% 0%, rgba(37, 211, 102, 0.08), transparent 50%),
+        #0a0d12;
+    }
+    .phone {
+      width: min(390px, calc(100vw - 28px));
+      height: min(740px, calc(100vh - 90px));
+      background: #0b141a;
+      border-radius: 36px;
+      border: 10px solid #1c1c1f;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .wa-head {
+      background: #202c33;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 14px 12px;
+    }
+    .wa-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f5c400;
+      color: #3a2208;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .wa-head b { display: block; font-size: 14px; }
+    .wa-head small { color: #8696a0; }
+    .wa-thread {
+      flex: 1;
+      overflow: auto;
+      padding: 14px 12px;
+      background: #0b141a;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 8px;
+      min-height: 0;
+    }
+    .bubble {
+      max-width: 82%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+      animation: rise 0.3s ease;
+      flex-shrink: 0;
+      color: #e9edef;
+    }
+    .bubble.them { background: #202c33; align-self: flex-start; }
+    .bubble.us { background: #005c4b; align-self: flex-end; }
+    .bubble time { display: block; text-align: right; font-size: 10px; color: #ffffff99; margin-top: 4px; }
+    .wa-empty { color: #8696a0; text-align: center; margin: auto; padding: 20px; }
+    .wa-input {
+      background: #202c33;
+      padding: 10px;
+      color: #8696a0;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .empty { color: var(--muted); padding: 24px; }
+
+    .ops-mobile-nav {
+      display: none;
+      gap: 6px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+    .ops-mobile-nav button {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: #c5c9d2;
+      border-radius: 999px;
+      padding: 7px 12px;
+      white-space: nowrap;
+    }
+    .ops-mobile-nav button.is-on { background: var(--red); color: white; border-color: var(--red); }
+
+    @media (max-width: 1100px) {
+      .order-detail { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .featured { grid-template-columns: 1fr; }
+      .kpis, .order-detail, .t-head { grid-template-columns: 1fr 1fr; }
+      .t-row { grid-template-columns: 1fr 1fr; }
+      .t-head { display: none; }
+      .ops-side { display: none; }
+      .ops-mobile-nav { display: flex !important; }
+      .hero-combo.with-photo { grid-template-columns: minmax(0, 1fr) 132px; }
+      .hero-combo.with-photo .hero-shot { min-height: 0; max-height: none; }
+      .ops-main { padding: 16px; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .presenter { padding: 6px 8px; gap: 6px; }
+      .presenter-mark { display: none; }
+      .presenter-tabs { flex: 1 1 auto; }
+      .presenter-tabs button,
+      .presenter-actions button { padding: 6px 9px; font-size: 11px; }
+      .presenter-actions { margin-left: auto; justify-content: flex-end; flex-wrap: wrap; }
+
+      .c-header { padding: 14px 14px 8px; }
+      .brand-name { font-size: 26px; }
+      .brand-tag { font-size: 12px; }
+      .cats { padding: 6px 14px 12px; }
+      .c-scroll { padding: 0 14px calc(20px + var(--safe-b)); }
+
+      .hero-combo { padding: 16px; border-radius: 20px; }
+      .hero-combo.with-photo { padding: 0; grid-template-columns: minmax(0, 1fr) 38%; }
+      .hero-combo.with-photo .hero-copy { padding: 12px 12px 12px 14px; }
+      .hero-combo.with-photo .hero-shot { min-height: 0; max-height: none; }
+      .hero-combo h2 { font-size: 20px; margin: 4px 0 2px; }
+      .hero-combo p { display: none; }
+      .hero-price { font-size: 18px; }
+
+      .product-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .pcard { border-radius: 16px; }
+      .pcard-art { height: auto; aspect-ratio: 1 / 1; }
+      .pcard-art svg { width: 64px; height: 64px; }
+      .pcard-body { padding: 10px 10px 12px; }
+      .pcard h3 { font-size: 13px; line-height: 1.25; }
+      .pcard p { display: none; }
+      .pcard-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .add-mini { width: 100%; padding: 7px 8px; font-size: 11px; }
+
+      .grid-2, .meta-grid { grid-template-columns: 1fr; }
+      .panel { padding-bottom: calc(28px + var(--safe-b)); }
+      .panel h1 { font-size: 30px; }
+      .confirm { padding: 8px 0 28px; }
+      .confirm h1 { font-size: 24px; }
+      .confirm .oid { font-size: 14px; }
+      .eta-card .mins { font-size: 48px; }
+
+      .modal {
+        width: calc(100vw - 16px);
+        max-height: calc(100vh - 72px);
+        overflow: auto;
+        top: auto;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        transform: translateY(16px);
+        border-radius: 22px 22px 18px 18px;
+      }
+      .modal.is-on { transform: translateY(0); }
+      .modal-art { height: auto; aspect-ratio: 16 / 10; max-height: 160px; }
+      .modal-body { padding: 16px; }
+      .modal-body h2 { font-size: 26px; }
+
+      .drawer {
+        width: 100%;
+        height: 100%;
+        padding-bottom: var(--safe-b);
+      }
+      .cart-item { grid-template-columns: 52px 1fr auto; gap: 10px; }
+      .cart-thumb { width: 52px; height: 52px; }
+
+      .toast { left: 12px; right: 12px; min-width: 0; top: auto; bottom: 16px; }
+
+      .phone {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .kv { grid-template-columns: 90px 1fr; font-size: 13px; }
+      .status-actions button { width: calc(50% - 4px); justify-content: center; }
+    }
+    @media (hover: none) {
+      .pcard:hover { transform: none; }
+    }
+    @media (max-width: 400px) {
+      .product-grid { gap: 8px; }
+      .pcard h3 { font-size: 12px; }
+    }
+    @media (max-width: 640px) {
+      .pitch { padding: 18px 16px 12px; }
+      .pitch-slide p.lead { font-size: 16px; }
+      .pitch-list li, .pitch-script { font-size: 14px; }
+      .pitch-slide h1 { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pitch" id="pitch" aria-label="Presentación">
+    <div class="pitch-top">
+      <div class="pitch-brand">King Broasted · Demo comercial</div>
+      <button class="pitch-skip" id="pitch-skip">Saltar al demo</button>
+    </div>
+    <section class="pitch-slide is-on" data-slide="0">
+      <div class="eyebrow">Neiva · pedidos en tiempo real</div>
+      <h1>De formulario a una operación que se ve.</h1>
+      <p class="lead">Hoy el menú está en un link. Esta demo muestra cómo se vería pedir, cocinar y avisar por WhatsApp… con un solo pedido recorriendo las tres pantallas.</p>
+    </section>
+    <section class="pitch-slide" data-slide="1">
+      <div class="eyebrow">El problema</div>
+      <h2>El pedido se parte en pedazos.</h2>
+      <ul class="pitch-list">
+        <li>El cliente pide en un formulario o por chat, sin ver el total claro antes de confirmar.</li>
+        <li>La cocina no tiene un tablero: el pedido llega suelto, a veces tarde, a veces incompleto.</li>
+        <li>El cliente escribe “¿ya va?” y “¿cuánto se demora?” porque nadie le confirma el tiempo.</li>
+      </ul>
+    </section>
+    <section class="pitch-slide" data-slide="2">
+      <div class="eyebrow">La propuesta</div>
+      <h2>Tres vistas. Un mismo pedido.</h2>
+      <ul class="pitch-list">
+        <li><b>Cliente</b> — menú real de King Broasted, carrito y total antes de confirmar.</li>
+        <li><b>Operación</b> — el pedido entra solo a la sede. Los estados son internos: el domiciliario no tiene que avisar cada entrega por chat.</li>
+        <li><b>WhatsApp</b> — al confirmar se envía solo la confirmación y el tiempo estimado al número registrado. Nada más.</li>
+      </ul>
+    </section>
+    <section class="pitch-slide" data-slide="3">
+      <div class="eyebrow">Guion de 90 segundos</div>
+      <h2>Esto es lo que vamos a hacer.</h2>
+      <div class="pitch-script">
+        <div><span>1</span><div>En Cliente, abre <b>Combo 1</b> ($57.900) y agrégalo.</div></div>
+        <div><span>2</span><div>Confirma el pedido de Andrea, Barrio Norte. Total <b>$60.900</b> (domicilio $3.000).</div></div>
+        <div><span>3</span><div>Pasa a Operación: pedido <b>KB-10482</b> en Sede Norte.</div></div>
+        <div><span>4</span><div>Abre WhatsApp: ya salió la confirmación y <b>40 minutos</b> al número de Andrea. Sin preguntar, sin más avisos.</div></div>
+      </div>
+    </section>
+    <section class="pitch-slide" data-slide="4">
+      <div class="eyebrow">Listo para mostrar</div>
+      <h2>Ábrelo en el celular o en pantalla grande.</h2>
+      <p class="lead">En el teléfono se ve como la app del cliente. En el computador cambias a Operación y WhatsApp con la barra de arriba.</p>
+      <div class="pitch-cta">
+        <button type="button" id="pitch-enter">Entrar al demo</button>
+        <button type="button" class="ghost" id="pitch-copy">Copiar enlace</button>
+      </div>
+    </section>
+    <div class="pitch-nav">
+      <button type="button" id="pitch-prev">Atrás</button>
+      <div class="pitch-dots" id="pitch-dots"></div>
+      <button type="button" id="pitch-next">Siguiente</button>
+    </div>
+  </div>
+
+  <div class="presenter" id="presenter">
+    <div class="presenter-mark">Presentador</div>
+    <div class="presenter-tabs">
+      <button data-view="customer" class="is-on">Cliente</button>
+      <button data-view="ops">Operación</button>
+      <button data-view="whatsapp">WhatsApp</button>
+    </div>
+    <div class="presenter-actions">
+      <button class="ghost" id="btn-pitch">Presentación</button>
+      <button class="ghost" id="btn-present">Pantalla completa</button>
+      <button class="danger" id="btn-reset">Reiniciar demo</button>
+    </div>
+  </div>
+  <div class="cue" id="cue">Guion: <b>1.</b> Combo 1 → <b>2.</b> Confirmar Andrea Norte → <b>3.</b> KB-10482 Sede Norte $60.900 · 40 min → <b>4.</b> WhatsApp: confirmación + tiempo</div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="stage">
+    <section class="view is-active" id="view-customer"></section>
+    <section class="view" id="view-ops"></section>
+    <section class="view" id="view-whatsapp"></section>
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal"></div>
+    <aside class="drawer" id="drawer"></aside>
+  </div>
+
+  <script>
+    /* ========== DATA ========== */
+    const CATEGORIES = ["Combos", "Pollo", "Bandejas", "Sándwiches", "Acompañamientos", "Bebidas"];
+    const MEDIA = "https://www.jotform.com/uploads/sitiosonline/form_files/";
+    const LOGO = MEDIA + "encabezado%20king%20broasted%204.6812a89dd69552.24194153.jpg";
+    const pic = (file) => MEDIA + file;
+    const STATUS_FLOW = ["RECEIVED", "CONFIRMED", "PREPARING", "READY", "ON_THE_WAY", "DELIVERED"];
+    const STATUS_LABEL = {
+      RECEIVED: "Pedido recibido",
+      CONFIRMED: "Confirmado",
+      PREPARING: "En preparación",
+      READY: "Listo",
+      ON_THE_WAY: "En camino",
+      DELIVERED: "Entregado",
+      CANCELLED: "Cancelado"
+    };
+
+    const PRODUCTS = [
+      { id: "c-1", name: "Combo 1", cat: "Combos", price: 57900, featured: true, img: pic("1_e2e5f2aec7f7abd329c4984fbbcc8281.jpg"), desc: "Un pollo broasted, arepas, papas a la francesa, plátano maduro, ensalada y gaseosa de 1.5 L." },
+      { id: "c-2", name: "Combo 2", cat: "Combos", price: 49900, img: pic("2_93d6ce696241237df4c32104573eafb9.jpg"), desc: "Un pollo broasted, arepas, papas a la francesa y gaseosa de 1.5 L." },
+      { id: "c-half", name: "Combo 1/2 pollo", cat: "Combos", price: 35900, img: pic("3_cdeb13eb87c6d6a3f130eeafec5ebe3b.jpg"), desc: "1/2 pollo broasted, arepas, papas a la francesa y ensalada." },
+      { id: "c-quarter", name: "Combo 1/4 pollo", cat: "Combos", price: 21900, img: pic("4_7c06625275159bebec3abf1e15c0aaeb.jpg"), desc: "1/4 de pollo broasted, arepas, papas a la francesa y gaseosa 400 ml." },
+      { id: "c-kids", name: "Combo infantil", cat: "Combos", price: 17900, img: pic("10_8944d9c52cabe8ee277045119ddee2ee.jpg"), desc: "Crispetas de pollo, papas a la francesa, jugo 200 ml y dulce." },
+      { id: "p-whole", name: "1 pollo broasted sencillo", cat: "Pollo", price: 39900, img: pic("6_242461c563c17b2a048c29c28d0ed11a.jpg"), desc: "Un pollo broasted (8 presas + 8 arepas)." },
+      { id: "p-half", name: "1/2 pollo sencillo", cat: "Pollo", price: 24900, img: pic("7_3c41111ee8c3d8b7e3c3ef4a72cd0081.jpg"), desc: "1/2 pollo broasted (4 presas + 4 arepas)." },
+      { id: "p-quarter", name: "1/4 pollo sencillo", cat: "Pollo", price: 13900, img: pic("8_cc81dd78b23f95cf064605e1dba6621a.jpg"), desc: "2 presas + 2 arepas." },
+      { id: "p-wings", name: "Alitas x6", cat: "Pollo", price: 17900, img: pic("piezas_de_alitas_ok_5ebf4d4aa2e7104a036d44007bbad99f.jpg"), desc: "Elige salsa BBQ, miel mostaza o crema de leña." },
+      { id: "p-crispy", name: "Crispetas de pollo", cat: "Pollo", price: 22900, img: pic("%E3%84%B2_f26e63e6e5059d43102dd2c307f95907.jpg"), desc: "Pollo apanado 300 g, papa a la francesa y salsa de la casa." },
+      { id: "b-quarter", name: "Bandeja broasted 1/4", cat: "Bandejas", price: 20900, img: pic("5_2f14ebdebe809c5c622e2d53b5f8dc3e.jpg"), desc: "1/4 de pollo, arepas, arroz, plátano maduro, ensalada y limonada." },
+      { id: "b-one", name: "Bandeja 1 presa", cat: "Bandejas", price: 16900, img: pic("bandeja_broasted_1_presa_b0bf6ae1ea322686448f7635225de68e.jpg"), desc: "1 presa, arepas, arroz, plátano maduro, ensalada y limonada." },
+      { id: "s-pollo", name: "Sándwich de pollo", cat: "Sándwiches", price: 20900, img: pic("%E3%84%B5_81bb19bfd0e0e9600f366629dc8230f4.jpg"), desc: "Pan brioche, pollo apanado, pepinillos, tomate, queso y ensalada." },
+      { id: "s-combo", name: "Sándwich en combo", cat: "Sándwiches", price: 30900, img: pic("combo_sandwich_diseno_a379270953479f8c4f537cd377e98ed8.jpg"), desc: "Sándwich + papas y Coca-Cola 400 ml, jugo o agua." },
+      { id: "a-papas", name: "Papa a la francesa", cat: "Acompañamientos", price: 7900, img: pic("9_c3edb1341e71316d2053f964829891b3.jpg"), desc: "Porción de papas a la francesa." },
+      { id: "a-platano", name: "Plátano maduro", cat: "Acompañamientos", price: 6900, img: pic("9_c3edb1341e71316d2053f964829891b3.jpg"), desc: "Plátano maduro frito." },
+      { id: "d-limonada", name: "Limonada de panela", cat: "Bebidas", price: 6900, desc: "Vaso de limonada de panela." },
+      { id: "d-coca", name: "Coca-Cola 400 ml", cat: "Bebidas", price: 5900, desc: "Coca-Cola original 400 ml." }
+    ];
+
+    function seedOrders() {
+      return [
+        orderRecord("KB-10479", "Carlos Mendoza", "310 555 0101", "Cra 5 # 12-40", "Centro", "Neiva", "Sede Centro", "DELIVERED", [
+          line("c-2", 1), line("a-papas", 1)
+        ]),
+        orderRecord("KB-10480", "Laura Gómez", "320 444 2211", "Calle 8 # 4-15", "Norte", "Neiva", "Sede Norte", "ON_THE_WAY", [
+          line("c-1", 1)
+        ]),
+        orderRecord("KB-10481", "Andrés Pérez", "300 111 7788", "Mz 12 Casa 4", "Sur", "Neiva", "Sede Sur", "PREPARING", [
+          line("p-whole", 1), line("d-coca", 1)
+        ])
+      ];
+    }
+
+    function line(id, qty, note) {
+      const p = PRODUCTS.find((x) => x.id === id);
+      return { id: p.id, name: p.name, price: p.price, qty, note: note || "", cat: p.cat, img: p.img };
+    }
+
+    function orderRecord(id, name, phone, address, barrio, city, branch, status, products) {
+      const subtotal = products.reduce((s, i) => s + i.price * i.qty, 0);
+      const deliveryFee = 3000;
+      const total = subtotal + deliveryFee;
+      const order = {
+        id, status, branch, products, subtotal, deliveryFee, total,
+        customer: { name, phone, address, barrio, city },
+        createdAt: Date.now() - 1000 * 60 * 40,
+        flash: false
+      };
+      order.etaMinutes = estimateMinutes(order);
+      return order;
+    }
+
+    const DEFAULT_CUSTOMER = {
+      name: "Andrea Rodríguez",
+      phone: "300 000 0000",
+      address: "Calle 10 # 20-30",
+      barrio: "Norte",
+      city: "Neiva"
+    };
+
+    /* ========== STATE ========== */
+    const appState = createInitialState();
+
+    function createInitialState() {
+      return {
+        currentView: "customer",
+        customerScreen: "menu",
+        opsScreen: "orders",
+        category: "Combos",
+        presentation: false,
+        cart: [],
+        cartOpen: false,
+        modalProduct: null,
+        modalQty: 1,
+        modalNote: "",
+        customer: { ...DEFAULT_CUSTOMER },
+        orders: seedOrders(),
+        nextSeq: 10482,
+        currentOrderId: null,
+        selectedOrderId: null,
+        notifications: [
+          { id: 1, text: "Pedido KB-10480 en camino", time: "hace 8 min" }
+        ],
+        messages: [],
+        toast: null,
+        newOrderAlert: false
+      };
+    }
+
+    function resetDemo() {
+      const fresh = createInitialState();
+      Object.keys(appState).forEach((k) => delete appState[k]);
+      Object.assign(appState, fresh);
+      document.body.classList.remove("presentation");
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      closeLayers();
+      render();
+      toast("Demo reiniciado", "Listo para repetir la presentación");
+    }
+
+    /* ========== HELPERS ========== */
+    const money = (n) => "$" + Math.round(n).toLocaleString("es-CO");
+    const byId = (id) => document.getElementById(id);
+    const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const cartCount = () => appState.cart.reduce((s, i) => s + i.qty, 0);
+    const cartSubtotal = () => appState.cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const deliveryFee = () => (cartCount() ? 3000 : 0);
+    const cartTotal = () => cartSubtotal() + deliveryFee();
+    const currentOrder = () => appState.orders.find((o) => o.id === appState.currentOrderId) || null;
+    const selectedOrder = () => appState.orders.find((o) => o.id === appState.selectedOrderId) || currentOrder();
+
+    function art(cat, size) {
+      const s = size || 88;
+      const icons = {
+        Hamburguesas: `<ellipse cx="44" cy="32" rx="28" ry="12" fill="#c47a3a"/><rect x="18" y="34" width="52" height="8" rx="3" fill="#c51f1f"/><rect x="20" y="42" width="48" height="7" rx="3" fill="#e8d48a"/><ellipse cx="44" cy="56" rx="28" ry="11" fill="#a35a24"/>`,
+        Combos: `<circle cx="30" cy="40" r="16" fill="#e8b86d"/><circle cx="30" cy="40" r="8" fill="#a34a1c"/><rect x="50" y="28" width="10" height="28" rx="3" fill="#f0c14a"/><rect x="62" y="32" width="10" height="24" rx="3" fill="#e2a24a"/><rect x="48" y="58" width="26" height="14" rx="4" fill="#3aa0d8"/>`,
+        Pollo: `<path d="M28 52c0-16 10-28 24-28 8 0 14 6 16 14 8 2 12 10 8 18-6 12-28 16-40 8-6-4-8-8-8-12z" fill="#e8b86d"/><circle cx="56" cy="30" r="4" fill="#2a1b11"/>`,
+        Bandejas: `<ellipse cx="44" cy="52" rx="30" ry="10" fill="#c47a3a"/><circle cx="44" cy="38" r="16" fill="#e8b86d"/>`,
+        "Sándwiches": `<rect x="18" y="30" width="52" height="10" rx="4" fill="#e2a24a"/><rect x="20" y="40" width="48" height="8" rx="3" fill="#f5c400"/><rect x="18" y="48" width="52" height="10" rx="4" fill="#c47a3a"/>`,
+        Acompañamientos: `<rect x="24" y="22" width="8" height="44" rx="3" fill="#f0c14a"/><rect x="36" y="18" width="8" height="48" rx="3" fill="#e2a24a"/><rect x="48" y="24" width="8" height="42" rx="3" fill="#f5d27a"/><rect x="60" y="20" width="8" height="46" rx="3" fill="#c45c26"/>`,
+        Bebidas: `<path d="M30 20h28l-4 48H34L30 20z" fill="#3aa0d8"/><rect x="28" y="16" width="32" height="8" rx="3" fill="#d4b07a"/><path d="M42 16c8-10 18-8 18-8" stroke="#e9edef" fill="none" stroke-width="3"/>`
+      };
+      const bg = {
+        Hamburguesas: "#3b2614",
+        Combos: "#24160f",
+        Pollo: "#2a1b11",
+        Acompañamientos: "#21190f",
+        Bebidas: "#10161e"
+      }[cat] || "#24160f";
+      return `<svg viewBox="0 0 88 88" width="${s}" height="${s}" aria-hidden="true">
+        <circle cx="44" cy="44" r="40" fill="${bg}"/>
+        ${icons[cat] || icons.Combos}
+      </svg>`;
+    }
+
+    function photoHTML(p, cls) {
+      const klass = (cls || "pcard-art") + (p.img ? " photo" : "");
+      const img = p.img ? `<img src="${p.img}" alt="${escapeHtml(p.name)}" onerror="this.remove()">` : "";
+      return `<div class="${klass}">${img}${art(p.cat)}</div>`;
+    }
+
+    function estimateMinutes(order) {
+      const heavyIds = ["c-1", "c-2", "p-whole"];
+      const heavy = (order.products || []).some((p) => heavyIds.includes(p.id));
+      const kitchen = heavy ? 30 : 22;
+      const travel = order.branch === "Sede Norte" ? 10 : order.branch === "Sede Sur" ? 15 : 12;
+      return kitchen + travel;
+    }
+
+    function assignBranch(barrio) {
+      const b = (barrio || "").toLowerCase();
+      if (b.includes("norte")) return "Sede Norte";
+      if (b.includes("centro")) return "Sede Centro";
+      if (b.includes("sur")) return "Sede Sur";
+      return "Sede Centro";
+    }
+
+    function nowTime() {
+      return new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function toast(title, sub) {
+      appState.toast = { title, sub };
+      renderToast();
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => { appState.toast = null; renderToast(); }, 2800);
+    }
+    function renderToast() {
+      const el = byId("toast");
+      if (!appState.toast) { el.classList.remove("is-on"); return; }
+      el.classList.add("is-on");
+      el.innerHTML = `<strong>${escapeHtml(appState.toast.title)}</strong><span>${escapeHtml(appState.toast.sub || "")}</span>`;
+    }
+
+    function closeLayers() {
+      appState.cartOpen = false;
+      appState.modalProduct = null;
+      byId("overlay").classList.remove("is-on");
+    }
+
+    /* ========== CART / ORDERS ========== */
+    function openProduct(id) {
+      const p = PRODUCTS.find((x) => x.id === id);
+      appState.modalProduct = p;
+      appState.modalQty = 1;
+      appState.modalNote = "";
+      renderModal();
+      byId("overlay").classList.add("is-on");
+    }
+
+    function addToCart() {
+      const p = appState.modalProduct;
+      if (!p) return;
+      const noteEl = document.querySelector("#modal-note");
+      if (noteEl) appState.modalNote = noteEl.value;
+      const existing = appState.cart.find((i) => i.id === p.id && i.note === appState.modalNote);
+      if (existing) existing.qty += appState.modalQty;
+      else appState.cart.push({ id: p.id, name: p.name, price: p.price, qty: appState.modalQty, note: appState.modalNote, cat: p.cat, img: p.img });
+      closeLayers();
+      appState.cartOpen = true;
+      toast("Agregado al carrito", p.name);
+      render();
+    }
+
+    function setQty(id, note, delta) {
+      const item = appState.cart.find((i) => i.id === id && i.note === note);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) appState.cart = appState.cart.filter((i) => i !== item);
+      render();
+    }
+
+    function confirmOrder() {
+      const c = appState.customer;
+      if (!c.name.trim() || !c.phone.trim() || !c.address.trim() || !c.barrio.trim() || !c.city.trim()) {
+        toast("Completa tus datos", "Todos los campos son obligatorios");
+        return;
+      }
+      if (!appState.cart.length) {
+        toast("Carrito vacío", "Agrega un producto para continuar");
+        return;
+      }
+      const id = "KB-" + appState.nextSeq;
+      appState.nextSeq += 1;
+      const branch = assignBranch(c.barrio);
+      const order = {
+        id,
+        status: "RECEIVED",
+        branch,
+        products: appState.cart.map((i) => ({ ...i })),
+        subtotal: cartSubtotal(),
+        deliveryFee: deliveryFee(),
+        total: cartTotal(),
+        customer: { ...c },
+        createdAt: Date.now(),
+        flash: true
+      };
+      order.etaMinutes = estimateMinutes(order);
+      const firstName = c.name.split(" ")[0];
+      appState.orders = [order, ...appState.orders];
+      appState.currentOrderId = id;
+      appState.selectedOrderId = null;
+      appState.cart = [];
+      appState.customerScreen = "tracking";
+      appState.newOrderAlert = true;
+      appState.notifications.unshift({ id: Date.now(), text: "Nuevo pedido " + id, time: "ahora" });
+      appState.messages = [
+        { from: "us", text: `Hola ${firstName} 👋\nConfirmamos tu pedido #${id}.\n${order.branch} · Total ${money(order.total)}.`, time: nowTime() },
+        { from: "us", text: `⏱ Tiempo estimado de entrega: ${order.etaMinutes} minutos.\nTe escribimos a ${c.phone} para que no tengas que preguntar. No enviaremos más mensajes de este pedido.`, time: nowTime() }
+      ];
+      closeLayers();
+      toast("Pedido recibido", id + " · " + branch);
+      render();
+    }
+
+    function setStatus(id, status) {
+      const order = appState.orders.find((o) => o.id === id);
+      if (!order || order.status === "CANCELLED") return;
+      order.status = status;
+      appState.notifications.unshift({ id: Date.now(), text: `#${id} → ${STATUS_LABEL[status]} (interno)`, time: "ahora" });
+      toast(STATUS_LABEL[status], "Cambio interno · el cliente no recibe WhatsApp");
+      render();
+    }
+
+    /* ========== RENDER ========== */
+    function switchView(name) {
+      appState.currentView = name;
+      if (name === "ops" && appState.newOrderAlert) {
+        toast("Nuevo pedido recibido", appState.currentOrderId || "Revisa la lista");
+        setTimeout(() => { appState.newOrderAlert = false; }, 1600);
+      }
+      render();
+    }
+
+    function render() {
+      document.querySelectorAll(".presenter-tabs button").forEach((b) => {
+        b.classList.toggle("is-on", b.dataset.view === appState.currentView);
+      });
+      ["customer", "ops", "whatsapp"].forEach((v) => {
+        byId("view-" + v).classList.toggle("is-active", appState.currentView === v);
+      });
+      if (appState.currentView === "customer") renderCustomer();
+      if (appState.currentView === "ops") renderOps();
+      if (appState.currentView === "whatsapp") renderWhatsApp();
+      renderModal();
+      renderDrawer();
+      byId("overlay").classList.toggle("is-on", !!(appState.cartOpen || appState.modalProduct));
+      renderToast();
+    }
+
+    function renderCustomer() {
+      const root = byId("view-customer");
+      if (appState.customerScreen === "checkout") { root.innerHTML = checkoutHTML(); bindCheckout(); return; }
+      if (appState.customerScreen === "tracking") { root.innerHTML = trackingHTML(); return; }
+      const showHero = appState.category === "Combos" || appState.category === "Todas";
+      const featured = PRODUCTS.find((p) => p.featured);
+      const list = PRODUCTS.filter((p) => {
+        if (appState.category !== "Todas" && p.cat !== appState.category) return false;
+        if (showHero && p.featured) return false;
+        return true;
+      });
+      root.innerHTML = `
+        <header class="c-header">
+          <div>
+            <img class="brand-logo" src="${LOGO}" alt="King Broasted" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <div class="brand-name" style="display:none">KING BROASTED</div>
+            <div class="brand-tag">Cuál es tu antojo de King?</div>
+          </div>
+          <button class="cart-btn" id="open-cart" aria-label="Abrir carrito">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M6 6L5 3H2"/></svg>
+            <span class="cart-count ${cartCount() ? "is-on" : ""}">${cartCount()}</span>
+          </button>
+        </header>
+        <div class="cats">
+          <button data-cat="Todas" class="${appState.category === "Todas" ? "is-on" : ""}">Todas</button>
+          ${CATEGORIES.map((c) => `<button data-cat="${c}" class="${appState.category === c ? "is-on" : ""}">${c}</button>`).join("")}
+        </div>
+        <div class="c-scroll">
+          ${showHero ? `
+            <div class="featured">
+              <button class="hero-combo with-photo" data-open="${featured.id}">
+                <div class="hero-copy">
+                  <small>El más pedido</small>
+                  <h2>${featured.name}</h2>
+                  <p>${featured.desc}</p>
+                  <div class="hero-price">${money(featured.price)}</div>
+                </div>
+                <div class="hero-shot">${featured.img ? `<img src="${featured.img}" alt="${escapeHtml(featured.name)}" onerror="this.remove()">` : art(featured.cat)}</div>
+              </button>
+            </div>` : ""}
+          <div class="product-grid">
+            ${list.map((p) => `
+              <button class="pcard" data-open="${p.id}">
+                ${photoHTML(p)}
+                <div class="pcard-body">
+                  <h3>${p.name}</h3>
+                  <p>${p.desc}</p>
+                  <div class="pcard-row">
+                    <span class="price">${money(p.price)}</span>
+                    <span class="add-mini">Agregar</span>
+                  </div>
+                </div>
+              </button>`).join("")}
+          </div>
+        </div>`;
+      root.querySelector("#open-cart").onclick = () => { appState.cartOpen = true; render(); };
+      root.querySelectorAll("[data-cat]").forEach((b) => b.onclick = () => { appState.category = b.dataset.cat; render(); });
+      root.querySelectorAll("[data-open]").forEach((b) => b.onclick = () => openProduct(b.dataset.open));
+    }
+
+    function checkoutHTML() {
+      const c = appState.customer;
+      return `
+        <header class="c-header">
+          <div>
+            <div class="brand-kicker">Checkout</div>
+            <div class="brand-name">Tus datos</div>
+            <div class="brand-tag">El total ya está calculado. Confirma cuando quieras.</div>
+          </div>
+        </header>
+        <div class="c-scroll">
+          <div class="panel">
+            <div class="grid-2">
+              ${field("name", "Nombre completo", c.name)}
+              ${field("phone", "Teléfono", c.phone)}
+            </div>
+            ${field("address", "Dirección", c.address)}
+            <div class="grid-2">
+              ${field("barrio", "Barrio", c.barrio)}
+              ${field("city", "Ciudad", c.city)}
+            </div>
+            <div class="summary-card">
+              ${totalsHTML(cartSubtotal(), deliveryFee(), cartTotal())}
+            </div>
+            <button class="btn-primary" id="confirm-order">Confirmar pedido</button>
+            <button class="btn-ghost" id="back-menu">Volver al menú</button>
+          </div>
+        </div>`;
+    }
+    function field(key, label, value) {
+      return `<label class="field"><span>${label}</span><input data-field="${key}" value="${escapeHtml(value)}" /></label>`;
+    }
+    function bindCheckout() {
+      byId("view-customer").querySelectorAll("[data-field]").forEach((i) => {
+        i.oninput = () => { appState.customer[i.dataset.field] = i.value; };
+      });
+      byId("view-customer").querySelector("#confirm-order").onclick = confirmOrder;
+      byId("view-customer").querySelector("#back-menu").onclick = () => { appState.customerScreen = "menu"; render(); };
+    }
+
+    function trackingHTML() {
+      const o = currentOrder();
+      if (!o) return `<div class="empty">No hay pedido activo.</div>`;
+      return `
+        <div class="c-scroll">
+          <div class="confirm">
+            <div class="check-orb">✓</div>
+            <div class="brand-kicker">Pedido confirmado</div>
+            <h1>Ya está en cocina</h1>
+            <div class="oid">#${o.id}</div>
+            <div class="eta-card">
+              <small>Tiempo estimado</small>
+              <div class="mins">${o.etaMinutes || estimateMinutes(o)}</div>
+              <p>minutos · lo enviamos a tu WhatsApp</p>
+            </div>
+            <div class="receipt">
+              <div class="receipt-row"><span>Sede</span><b>${escapeHtml(o.branch)}</b></div>
+              <div class="receipt-row"><span>Entrega</span><b>${escapeHtml(o.customer.address)}</b></div>
+              <div class="receipt-row"><span>WhatsApp</span><b>${escapeHtml(o.customer.phone)}</b></div>
+              <div class="receipt-row"><span>Total</span><b>${money(o.total)}</b></div>
+              ${o.products.map((item) => `<div class="receipt-row"><span>${escapeHtml(item.name)} ×${item.qty}</span><b>${money(item.price * item.qty)}</b></div>`).join("")}
+              <p class="receipt-note">Confirmación y tiempo estimado ya salieron al número registrado. No hace falta escribir para preguntar cuánto se demora, y no te vamos a saturar con cada paso de la cocina.</p>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function totalsHTML(sub, del, tot) {
+      return `<div class="totals">
+        <div><span>Subtotal</span><span>${money(sub)}</span></div>
+        <div><span>Domicilio</span><span>${money(del)}</span></div>
+        <div class="grand"><span>TOTAL</span><span>${money(tot)}</span></div>
+      </div>`;
+    }
+
+    function renderOps() {
+      const root = byId("view-ops");
+      const nav = (id, label) => `<button data-ops="${id}" class="${appState.opsScreen === id ? "is-on" : ""}">${label}</button>`;
+      root.innerHTML = `
+        <aside class="ops-side">
+          <div class="ops-logo"><strong>Operación</strong><span>King Broasted</span></div>
+          <div class="ops-nav">
+            ${nav("dashboard", "Dashboard")}
+            ${nav("orders", "Pedidos")}
+            ${nav("products", "Productos")}
+            ${nav("branches", "Sedes")}
+            ${nav("notifications", "Notificaciones")}
+          </div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div class="ops-mobile-nav">
+            ${nav("dashboard", "Dashboard")}${nav("orders", "Pedidos")}${nav("products", "Productos")}${nav("branches", "Sedes")}${nav("notifications", "Avisos")}
+          </div>
+          <div class="ops-main">${opsMainHTML()}</div>
+        </div>`;
+      root.querySelectorAll("[data-ops]").forEach((b) => b.onclick = () => { appState.opsScreen = b.dataset.ops; if (b.dataset.ops === "orders") appState.selectedOrderId = appState.selectedOrderId || appState.currentOrderId; render(); });
+      bindOpsMain();
+    }
+
+    function opsMainHTML() {
+      if (appState.opsScreen === "dashboard") return dashboardHTML();
+      if (appState.opsScreen === "products") return `<div class="ops-top"><div><h1>Productos</h1><p>Catálogo activo del menú digital.</p></div></div><div class="table">${PRODUCTS.map((p) => `<div class="t-row" style="grid-template-columns:1.4fr 1fr 1fr"><b>${p.name}</b><span>${p.cat}</span><span>${money(p.price)}</span></div>`).join("")}</div>`;
+      if (appState.opsScreen === "branches") return `<div class="ops-top"><div><h1>Sedes</h1><p>Asignación automática por barrio.</p></div></div><div class="kpis"><div class="kpi"><small>Norte</small><b>Sede Norte</b></div><div class="kpi"><small>Centro</small><b>Sede Centro</b></div><div class="kpi"><small>Sur</small><b>Sede Sur</b></div><div class="kpi"><small>Fallback</small><b>Sede Centro</b></div></div>`;
+      if (appState.opsScreen === "notifications") return `<div class="ops-top"><div><h1>Notificaciones</h1></div></div><div class="table">${appState.notifications.map((n) => `<div class="t-row" style="grid-template-columns:1fr auto"><span>${escapeHtml(n.text)}</span><small>${n.time}</small></div>`).join("")}</div>`;
+      if (appState.selectedOrderId) return orderDetailHTML();
+      return ordersListHTML();
+    }
+
+    function dashboardHTML() {
+      const extra = appState.orders.filter((o) => o.id === appState.currentOrderId).length;
+      const pending = appState.orders.filter((o) => o.status === "RECEIVED" || o.status === "CONFIRMED").length;
+      const prep = appState.orders.filter((o) => o.status === "PREPARING").length;
+      const sales = 1137200 + appState.orders.reduce((s, o) => s + o.total, 0);
+      return `
+        <div class="ops-top"><div><h1>Dashboard</h1><p>Operación en vivo · Neiva</p></div></div>
+        <div class="kpis">
+          <div class="kpi"><small>Pedidos hoy</small><b>${21 + appState.orders.length}</b></div>
+          <div class="kpi"><small>Pendientes</small><b>${4 + pending}</b></div>
+          <div class="kpi"><small>En preparación</small><b>${7 + prep}</b></div>
+          <div class="kpi"><small>Ventas</small><b>${money(sales)}</b></div>
+        </div>
+        ${ordersListHTML()}`;
+    }
+
+    function ordersListHTML() {
+      return `
+        <div class="ops-top"><div><h1>Pedidos</h1><p>Los pedidos del menú digital llegan aquí al instante.</p></div></div>
+        <div class="table">
+          <div class="t-head"><span>Pedido</span><span>Cliente</span><span>Sede</span><span>Total</span><span>Estado</span><span></span></div>
+          ${appState.orders.map((o) => `
+            <button class="t-row ${o.flash ? "pulse-new" : ""}" data-open-order="${o.id}">
+              <b>${o.id}</b>
+              <span>${escapeHtml(o.customer.name.split(" ")[0])}</span>
+              <span>${escapeHtml(o.branch)}</span>
+              <span>${money(o.total)}</span>
+              <span class="badge st-${o.status}">${STATUS_LABEL[o.status]}</span>
+              <span>›</span>
+            </button>`).join("")}
+        </div>`;
+    }
+
+    function orderDetailHTML() {
+      const o = selectedOrder();
+      if (!o) return ordersListHTML();
+      return `
+        <div class="ops-top">
+          <div>
+            <p style="color:var(--gold);cursor:pointer" id="back-orders">← Pedidos</p>
+            <h1>PEDIDO #${o.id}</h1>
+            <p>Estados internos de cocina. El cliente ya recibió confirmación y tiempo por WhatsApp.</p>
+          </div>
+          <span class="badge st-${o.status}">${STATUS_LABEL[o.status]}</span>
+        </div>
+        <div class="order-detail">
+          <div class="card">
+            <h3>Cliente</h3>
+            <div class="kv">
+              <span>Nombre</span><b>${escapeHtml(o.customer.name)}</b>
+              <span>Teléfono</span><b>${escapeHtml(o.customer.phone)}</b>
+              <span>Dirección</span><b>${escapeHtml(o.customer.address)}</b>
+              <span>Barrio</span><b>${escapeHtml(o.customer.barrio)}</b>
+              <span>Ciudad</span><b>${escapeHtml(o.customer.city)}</b>
+              <span>Sede</span><b>${escapeHtml(o.branch)}</b>
+              <span>Tiempo est.</span><b>${o.etaMinutes || estimateMinutes(o)} min</b>
+              <span>Estado</span><b>${STATUS_LABEL[o.status]}</b>
+            </div>
+            <div class="status-actions">
+              <button data-st="CONFIRMED" class="${o.status === "CONFIRMED" ? "is-now" : ""}">Confirmar</button>
+              <button data-st="PREPARING" class="${o.status === "PREPARING" ? "is-now" : ""}">En preparación</button>
+              <button data-st="READY" class="${o.status === "READY" ? "is-now" : ""}">Listo</button>
+              <button data-st="ON_THE_WAY" class="${o.status === "ON_THE_WAY" ? "is-now" : ""}">En camino</button>
+              <button data-st="DELIVERED" class="${o.status === "DELIVERED" ? "is-now" : ""}">Entregado</button>
+              <button class="cancel ${o.status === "CANCELLED" ? "is-now" : ""}" data-st="CANCELLED">Cancelar</button>
+            </div>
+            <p class="ops-hint">Estos botones no le escriben al cliente. WhatsApp solo sale una vez: confirmación + ${o.etaMinutes || estimateMinutes(o)} min al ${escapeHtml(o.customer.phone)}.</p>
+          </div>
+          <div class="card">
+            <h3>Productos</h3>
+            ${o.products.map((item) => `<div class="totals"><div><span>${escapeHtml(item.name)} ×${item.qty}${item.note ? "<br><small>" + escapeHtml(item.note) + "</small>" : ""}</span><span>${money(item.price * item.qty)}</span></div></div>`).join("")}
+            ${totalsHTML(o.subtotal, o.deliveryFee, o.total)}
+          </div>
+        </div>`;
+    }
+
+    function bindOpsMain() {
+      const root = byId("view-ops");
+      root.querySelectorAll("[data-open-order]").forEach((b) => b.onclick = () => {
+        const o = appState.orders.find((x) => x.id === b.dataset.openOrder);
+        if (o) o.flash = false;
+        appState.selectedOrderId = b.dataset.openOrder;
+        appState.opsScreen = "orders";
+        render();
+      });
+      const back = root.querySelector("#back-orders");
+      if (back) back.onclick = () => { appState.selectedOrderId = null; render(); };
+      root.querySelectorAll("[data-st]").forEach((b) => b.onclick = () => setStatus(appState.selectedOrderId, b.dataset.st));
+    }
+
+    function renderWhatsApp() {
+      const o = currentOrder();
+      const root = byId("view-whatsapp");
+      root.innerHTML = `
+        <div class="phone">
+          <div class="wa-head">
+            <div class="wa-avatar">KB</div>
+            <div>
+              <b>KING BROASTED</b>
+              <small>${o ? "pedido #" + o.id : "en línea"}</small>
+            </div>
+          </div>
+          <div class="wa-thread" id="wa-thread">
+            ${appState.messages.length ? appState.messages.map((m) => `
+              <div class="bubble ${m.from === "us" ? "us" : "them"}">${escapeHtml(m.text).replace(/\n/g, "<br>")}<time>${m.time}</time></div>
+            `).join("") : `<div class="wa-empty">Aún no hay conversación.<br>Al confirmar un pedido se envía solo la confirmación y el tiempo estimado al número registrado.</div>`}
+          </div>
+          <div class="wa-input">WhatsApp simulado · un aviso al confirmar, no por cada estado</div>
+        </div>`;
+      const thread = byId("wa-thread");
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    }
+
+    function renderModal() {
+      const el = byId("modal");
+      const p = appState.modalProduct;
+      if (!p) { el.classList.remove("is-on"); el.innerHTML = ""; return; }
+      el.classList.add("is-on");
+      el.innerHTML = `
+        <div class="modal-art photo">${p.img ? `<img src="${p.img}" alt="${escapeHtml(p.name)}" onerror="this.remove()">` : ""}${art(p.cat, 120)}</div>
+        <div class="modal-body">
+          <h2>${p.name}</h2>
+          <p class="desc">${p.desc}</p>
+          <div class="price" style="font-size:22px">${money(p.price)}</div>
+          <div class="qty">
+            <button id="qty-minus">−</button>
+            <span>${appState.modalQty}</span>
+            <button id="qty-plus">+</button>
+          </div>
+          <textarea id="modal-note" placeholder="Observaciones: Sin cebolla...">${escapeHtml(appState.modalNote)}</textarea>
+          <button class="btn-primary" id="add-cart">Agregar al carrito · ${money(p.price * appState.modalQty)}</button>
+        </div>`;
+      el.querySelector("#qty-minus").onclick = () => { appState.modalQty = Math.max(1, appState.modalQty - 1); renderModal(); };
+      el.querySelector("#qty-plus").onclick = () => { appState.modalQty += 1; renderModal(); };
+      el.querySelector("#modal-note").oninput = (e) => { appState.modalNote = e.target.value; };
+      el.querySelector("#add-cart").onclick = addToCart;
+    }
+
+    function renderDrawer() {
+      const el = byId("drawer");
+      el.classList.toggle("is-on", appState.cartOpen);
+      el.innerHTML = `
+        <div class="drawer-head">
+          <h3>Tu pedido</h3>
+          <button class="btn-ghost" style="width:auto;padding:6px 10px;margin:0" id="close-cart">Cerrar</button>
+        </div>
+        <div class="drawer-body">
+          ${appState.cart.length ? appState.cart.map((i) => `
+            <div class="cart-item">
+              <div class="cart-thumb photo">${i.img ? `<img src="${i.img}" alt="" onerror="this.remove()">` : ""}${art(i.cat || "Combos", 44)}</div>
+              <div>
+                <h4>${escapeHtml(i.name)}</h4>
+                <small>${money(i.price)}${i.note ? " · " + escapeHtml(i.note) : ""}</small>
+                <div class="qty">
+                  <button data-q="${i.id}" data-note="${escapeHtml(i.note)}" data-d="-1">−</button>
+                  <span>${i.qty}</span>
+                  <button data-q="${i.id}" data-note="${escapeHtml(i.note)}" data-d="1">+</button>
+                </div>
+              </div>
+              <b>${money(i.price * i.qty)}</b>
+            </div>`).join("") : `<div class="empty">El carrito está vacío.</div>`}
+        </div>
+        <div class="drawer-foot">
+          ${totalsHTML(cartSubtotal(), deliveryFee(), cartTotal())}
+          <button class="btn-primary" id="go-checkout" ${appState.cart.length ? "" : "disabled"}>Continuar pedido</button>
+        </div>`;
+      el.querySelector("#close-cart").onclick = () => { appState.cartOpen = false; render(); };
+      el.querySelectorAll("[data-q]").forEach((b) => b.onclick = () => setQty(b.dataset.q, b.dataset.note, Number(b.dataset.d)));
+      el.querySelector("#go-checkout").onclick = () => {
+        if (!appState.cart.length) return;
+        appState.cartOpen = false;
+        appState.customerScreen = "checkout";
+        render();
+      };
+    }
+
+    /* ========== EVENTS ========== */
+    document.querySelectorAll(".presenter-tabs button").forEach((b) => {
+      b.onclick = () => switchView(b.dataset.view);
+    });
+    byId("btn-reset").onclick = resetDemo;
+    byId("btn-present").onclick = async () => {
+      appState.presentation = !appState.presentation;
+      document.body.classList.toggle("presentation", appState.presentation);
+      try {
+        if (appState.presentation && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (!appState.presentation && document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+      } catch (_) {}
+    };
+    byId("overlay").onclick = () => { closeLayers(); render(); };
+
+    /* ========== PITCH ========== */
+    const pitchSlides = [...document.querySelectorAll(".pitch-slide")];
+    const pitchDots = byId("pitch-dots");
+    let pitchIndex = 0;
+    const params = new URLSearchParams(location.search);
+    const skipPitch = params.get("demo") === "1" || location.hash === "#demo";
+
+    function showPitch(on) {
+      document.body.classList.toggle("show-pitch", on);
+    }
+    function renderPitch() {
+      pitchSlides.forEach((s, i) => s.classList.toggle("is-on", i === pitchIndex));
+      pitchDots.innerHTML = pitchSlides.map((_, i) => `<i class="${i === pitchIndex ? "is-on" : ""}"></i>`).join("");
+      byId("pitch-prev").disabled = pitchIndex === 0;
+      byId("pitch-next").textContent = pitchIndex === pitchSlides.length - 1 ? "Entrar" : "Siguiente";
+    }
+    function enterDemo() {
+      showPitch(false);
+      if (!location.search.includes("demo=1")) {
+        history.replaceState(null, "", location.pathname + "?demo=1" + location.hash.replace("#demo", ""));
+      }
+    }
+    function openPitch() {
+      pitchIndex = 0;
+      showPitch(true);
+      renderPitch();
+    }
+    renderPitch();
+    showPitch(!skipPitch);
+    byId("pitch-prev").onclick = () => { pitchIndex = Math.max(0, pitchIndex - 1); renderPitch(); };
+    byId("pitch-next").onclick = () => {
+      if (pitchIndex >= pitchSlides.length - 1) { enterDemo(); return; }
+      pitchIndex += 1;
+      renderPitch();
+    };
+    byId("pitch-skip").onclick = enterDemo;
+    byId("pitch-enter").onclick = enterDemo;
+    byId("btn-pitch").onclick = openPitch;
+    byId("pitch-copy").onclick = async () => {
+      const url = location.href.split("#")[0];
+      try {
+        await navigator.clipboard.writeText(url.replace(/\?demo=1/, "") || url);
+        byId("pitch-copy").textContent = "Enlace copiado";
+      } catch (_) {
+        byId("pitch-copy").textContent = "Copia la barra de dirección";
+      }
+    };
+    document.addEventListener("keydown", (e) => {
+      if (!document.body.classList.contains("show-pitch")) return;
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); byId("pitch-next").click(); }
+      if (e.key === "ArrowLeft") byId("pitch-prev").click();
+      if (e.key === "Escape") enterDemo();
+    });
+    let pitchTouchX = 0;
+    byId("pitch").addEventListener("touchstart", (e) => { pitchTouchX = e.changedTouches[0].clientX; }, { passive: true });
+    byId("pitch").addEventListener("touchend", (e) => {
+      const dx = e.changedTouches[0].clientX - pitchTouchX;
+      if (dx < -40) byId("pitch-next").click();
+      if (dx > 40) byId("pitch-prev").click();
+    }, { passive: true });
+
+    render();
+  </script>
+</body>
+</html>
